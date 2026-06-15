@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>My Whole World ❤️ | Forever Yours</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: white;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            touch-action: pan-x pan-y;
+        }
+
+        .bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #800000 0%, #1a0000 100%);
+            z-index: -2;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            animation: fadeIn 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .active {
+            display: flex !important;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gold-border {
+            border: 3px double #d4af37;
+            padding: 20px;
+            border-radius: 32px;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(12px);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn {
+            padding: 12px 28px;
+            font-size: clamp(18px, 5vw, 24px);
+            font-family: 'Dancing Script', cursive;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s;
+            font-weight: bold;
+            margin-top: 20px;
+            display: inline-block;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-gold {
+            background: #d4af37;
+            color: #2c0101;
+            box-shadow: 0 0 18px #d4af37;
+        }
+
+        .btn-pink {
+            background: #ff4d6d;
+            color: white;
+            box-shadow: 0 0 12px #ff4d6d;
+        }
+
+        .btn-yes {
+            background: #d4af37;
+            color: #2c0101;
+            font-size: 26px;
+            padding: 14px 40px;
+            box-shadow: 0 0 20px #ffb3c6;
+            border: none;
+            border-radius: 60px;
+            font-family: 'Dancing Script', cursive;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #ff4d6d;
+        }
+
+        .btn-no {
+            background: #3a2a2a;
+            color: #c0a0a0;
+            font-size: 24px;
+            padding: 12px 32px;
+            position: relative;
+            border: 1px solid #a55;
+            transition: left 0.1s linear, top 0.1s linear;
+            z-index: 20;
+            cursor: pointer;
+            touch-action: none;
+        }
+
+        .text-bubble {
+            font-size: clamp(16px, 4.5vw, 24px);
+            font-style: italic;
+            width: 100%;
+            max-width: 650px;
+            line-height: 1.6;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 18px;
+            border-radius: 48px;
+            backdrop-filter: blur(4px);
+            margin-bottom: 12px;
+        }
+
+        .photo-frame {
+            width: 78%;
+            max-width: 280px;
+            border: 5px solid #d4af37;
+            border-radius: 28px;
+            box-shadow: 0 0 40px #ff4d6d;
+            overflow: hidden;
+            background: #1a0202;
+            transition: transform 0.4s;
+            margin-bottom: 12px;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            aspect-ratio: 3 / 4;
+        }
+
+        .quote {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(20px, 5vw, 32px);
+            margin-top: 18px;
+            color: #ffccd5;
+            text-shadow: 0 0 8px #ff4d6d;
+        }
+
+        .promise-list {
+            text-align: left;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .promise-item {
+            font-size: clamp(14px, 4vw, 19px);
+            margin: 14px 0;
+            color: #ffccd5;
+            animation: slideIn 0.5s ease forwards;
+            opacity: 0;
+            padding-left: 8px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .heart-particle {
+            position: absolute;
+            color: #ffb3c6;
+            filter: drop-shadow(0 0 4px #ff4d6d);
+            pointer-events: none;
+            z-index: 5;
+            font-weight: normal;
+            animation: floatUp 4s linear forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.3);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .glow-text {
+            text-shadow: 0 0 10px #ff4d6d, 0 0 20px #d4af37;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { text-shadow: 0 0 5px #ff4d6d; }
+            50% { text-shadow: 0 0 20px #ff4d6d, 0 0 10px #d4af37; }
+            100% { text-shadow: 0 0 5px #ff4d6d; }
+        }
+
+        .romantic-line {
+            font-size: clamp(14px, 3.5vw, 18px);
+            color: #ffb3c6;
+            margin: 8px 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 550px) {
+            .gold-border {
+                padding: 16px;
+            }
+            .btn {
+                padding: 10px 20px;
+            }
+            .btn-yes {
+                padding: 10px 32px;
+                font-size: 24px;
+            }
+            .btn-no {
+                font-size: 20px;
+                padding: 8px 28px;
+            }
+        }
+
+        .scene::-webkit-scrollbar {
+            width: 0;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-canvas"></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- CHAPTER 0: INTRO -->
+    <div class="scene active" id="s0">
+        <div class="gold-border">
+            <h1 style="font-family: 'Dancing Script'; font-size: clamp(32px, 9vw, 52px); margin-bottom: 18px; color: #d4af37;">Mere Dil Ki Baat... 🌸</h1>
+            <p style="margin-bottom: 24px; font-size: clamp(15px, 4vw, 20px);">Please isse pure pyaar se padhna ❤️</p>
+            <button class="btn btn-gold" id="startMagicBtn">Start the Magic ❤️</button>
+        </div>
+    </div>
+
+    <!-- CHAPTER 1: APOLOGY (EXTENDED) -->
+    <div class="scene" id="s1">
+        <div class="text-bubble" id="t1"></div>
+        <button class="btn btn-pink" id="next1" style="display:none;">I want to tell you more... 🥺</button>
+    </div>
+
+    <!-- CHAPTER 2: REALIZATION (EXTENDED) -->
+    <div class="scene" id="s2">
+        <div class="text-bubble" id="t2"></div>
+        <button class="btn btn-pink" id="next2" style="display:none;">Look at this... ❤️</button>
+    </div>
+
+    <!-- CHAPTER 3: REVEAL PHOTO -->
+    <div class="scene" id="s3">
+        <div class="photo-frame">
+            <img src="gf.jpeg" alt="My Beautiful Queen" id="myQueenImg" onerror="fixImage()">
+        </div>
+        <div class="quote" id="q-text">
+            "Tumhare chehre ki yeh muskurahat <br>
+            mere jeene ki wajah hai. ❤️"
+        </div>
+        <button class="btn btn-pink" id="gotoPromisesBtn">Mere Vade (My Promises) 💍</button>
+    </div>
+
+    <!-- CHAPTER 4: PROMISES (EXTENDED - 8 PROMISES) -->
+    <div class="scene" id="s4">
+        <h1 style="font-family: 'Dancing Script'; font-size: clamp(32px, 8vw, 46px); margin-bottom: 20px; color: #d4af37;">I Promise You... ♾️</h1>
+        <div class="gold-border" style="text-align: left;">
+            <div class="promise-list">
+                <div class="promise-item" style="animation-delay: 0.1s;">✨ Tumhe kabhi rone nahi dunga... kabhi nahi</div>
+                <div class="promise-item" style="animation-delay: 0.3s;">✨ Tumhari har baat sununga... dil se</div>
+                <div class="promise-item" style="animation-delay: 0.5s;">✨ Tumhe duniya ki har khushi dunga... har pal</div>
+                <div class="promise-item" style="animation-delay: 0.7s;">✨ Hamesha tumhara saath nibhaunga... janmon tak</div>
+                <div class="promise-item" style="animation-delay: 0.9s;">✨ Tumhe har roz pyaar jatunga... naye andaaz mein</div>
+                <div class="promise-item" style="animation-delay: 1.1s;">✨ Tumhari har ada pe marte rahenge... hamesha</div>
+                <div class="promise-item" style="animation-delay: 1.3s;">✨ Tumhe apni zindagi ka sabse khoobsurat hissa banake rakhunga</div>
+                <div class="promise-item" style="animation-delay: 1.5s;">✨ Tumse kabhi jhooth nahi bolunga... sachcha pyaar</div>
+            </div>
+        </div>
+        <button class="btn btn-pink" style="margin-top: 32px;" id="lastQuestionBtn">One Last Thing... 🥺</button>
+    </div>
+
+    <!-- CHAPTER 5: EXTRA ROMANTIC MESSAGES BEFORE QUESTION -->
+    <div class="scene" id="s4_5">
+        <div class="gold-border">
+            <h1 style="font-family: 'Dancing Script'; font-size: clamp(28px, 7vw, 42px); color: #d4af37; margin-bottom: 25px;">Tumse Milke... 🌹</h1>
+            <div class="romantic-line">💕 Maine pyaar ko samjha...</div>
+            <div class="romantic-line">💕 Tumhari muskurahat meri rooh ko sukoon deti hai</div>
+            <div class="romantic-line">💕 Tumhari aankhon mein main apna jahann dekhta hoon</div>
+            <div class="romantic-line">💕 Har dhadkan tumhara naam leti hai</div>
+            <div class="romantic-line">💕 Tumse door hona meri sabse badi saza hai</div>
+            <div class="romantic-line">💕 Main tumhara hoon... sirf tumhara</div>
+            <div class="romantic-line">💕 Janam janam ka saath hai mera tumse ❤️</div>
+        </div>
+        <button class="btn btn-pink" id="gotoQuestionBtn">Puchna Hai Kuch... 🥺💍</button>
+    </div>
+
+    <!-- CHAPTER 6: BIG QUESTION (moving NO) -->
+    <div class="scene" id="s5">
+        <h1 style="font-family: 'Dancing Script'; font-size: clamp(34px, 8vw, 52px); margin-bottom: 20px; color: #ffb3c6;">Maaf Kar Do Na? 🥺❤️</h1>
+        <div style="position: relative; width: 100%; display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; align-items: center; margin-top: 20px;">
+            <button class="btn-yes" id="yesBtn">YES! ❤️</button>
+            <button class="btn-no" id="noBtn">No 💔</button>
+        </div>
+        <p style="margin-top: 40px; font-size: 14px; opacity: 0.7;">(no button tries to run away 😉)</p>
+    </div>
+
+    <!-- CHAPTER 7: FINAL LOVE WITH EXTRA MESSAGES -->
+    <div class="scene" id="sFinal">
+        <div class="gold-border">
+            <h1 style="font-family: 'Dancing Script'; font-size: clamp(44px, 11vw, 70px); color: #d4af37; margin-bottom: 15px;" class="glow-text">I LOVE YOU FOREVER! 😍❤️</h1>
+            <div class="text-bubble" style="margin-top: 18px; background: none; backdrop-filter: none;">
+                Thank you for being the most amazing part of my life. <br><br>
+                Ab jaldi se ek pyari si smile do! 😊♾️🌸<br><br>
+                <span style="font-size: 0.9em;">~ Tumhara hamesha, Sirf Tumhara ~</span>
+            </div>
+            <div style="margin-top: 20px; font-size: clamp(18px, 4vw, 24px); font-family: 'Dancing Script';">
+                ❤️ FOREVER BEGINS NOW ❤️
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IMAGE ERROR HANDLER
+        window.fixImage = function() {
+            const img = document.getElementById('myQueenImg');
+            if (img && (img.naturalWidth === 0 || img.src.includes('gf.jpeg'))) {
+                img.src = 'https://placehold.co/400x500/3a0202/ffccd5?text=My+Beautiful+Queen+❤️';
+                img.style.objectFit = 'cover';
+                img.alt = "My Beautiful Queen";
+            }
+        };
+
+        setTimeout(() => {
+            const imgEl = document.getElementById('myQueenImg');
+            if (imgEl && imgEl.complete && imgEl.naturalWidth === 0) fixImage();
+            else if (imgEl && !imgEl.complete) {
+                imgEl.onerror = fixImage;
+            }
+        }, 100);
+
+        // SCENE MANAGEMENT
+        function goToScene(id) {
+            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+            const targetScene = document.getElementById(id);
+            if (targetScene) targetScene.classList.add('active');
+            if (targetScene) targetScene.scrollTop = 0;
+        }
+
+        // TYPEWRITER EFFECT (EXTENDED MESSAGES)
+        function typeWriter(elId, text, nextBtnId) {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            el.innerHTML = "";
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    el.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, 50);
+                } else {
+                    if (nextBtnId) {
+                        const btn = document.getElementById(nextBtnId);
+                        if (btn) btn.style.display = 'block';
+                    }
+                }
+            }
+            type();
+        }
+
+        // EXTENDED APOLOGY MESSAGE
+        function startJourney() {
+            goToScene('s1');
+            const msg1 = "Suno... main jaanta hoon ki mujhse galti hui hai, aur tumhara gussa hona bilkul sahi hai. Par is khamoshi ne mujhe tod diya hai... Main maafi maangta hoon dil se. 🌸🥺\n\nTum bin main adhoora hoon, tum bin main tanha hoon. Please maaf kar do mujhe...";
+            typeWriter('t1', msg1, 'next1');
+        }
+
+        // EXTENDED REALIZATION MESSAGE
+        function startChapter2() {
+            goToScene('s2');
+            const msg2 = "Maine bahut socha, aur mujhe ehsas hua ki tum mere liye kya ho. Tum sirf meri girlfriend nahi, meri puri duniya ho. Tumhare bina yeh sab kuch adhoora hai... ❤️ Tum meri zindagi ho, aur main tumhe khone se darta hoon.\n\nTumhari har baat, tumhara har andaaz, tumhari har adaa... sab kuch yaad hai mujhe. Main pagal hoon tumpe.";
+            typeWriter('t2', msg2, 'next2');
+        }
+
+        function goToPhotoScene() {
+            goToScene('s3');
+            canvasConfetti({ particleCount: 80, spread: 55, origin: { y: 0.6 }, colors: ['#d4af37', '#ff4d6d'] });
+        }
+
+        function goToPromises() {
+            goToScene('s4');
+        }
+
+        // EXTRA ROMANTIC SCENE
+        function goToExtraRomantic() {
+            goToScene('s4_5');
+        }
+
+        function goToQuestion() {
+            goToScene('s5');
+            repositionNoButtonInitial();
+        }
+
+        // SMART MOVING "NO" BUTTON
+        function getSafeNoPosition() {
+            const noBtn = document.getElementById('noBtn');
+            if (!noBtn) return { x: 10, y: 10 };
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+            const btnW = noBtn.offsetWidth;
+            const btnH = noBtn.offsetHeight;
+            if (btnW === 0 || btnH === 0) return { x: winW * 0.7, y: winH * 0.5 };
+            const maxX = Math.max(0, winW - btnW - 15);
+            const maxY = Math.max(0, winH - btnH - 30);
+            const randomX = Math.min(maxX, Math.max(8, Math.random() * maxX));
+            const randomY = Math.min(maxY, Math.max(25, Math.random() * maxY));
+            return { x: randomX, y: randomY };
+        }
+
+        function repositionNoButtonInitial() {
+            const noBtn = document.getElementById('noBtn');
+            if (!noBtn) return;
+            noBtn.style.position = 'fixed';
+            const { x, y } = getSafeNoPosition();
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+            noBtn.style.transition = 'left 0.08s ease-out, top 0.08s ease-out';
+        }
+
+        function moveNoButton() {
+            const noBtn = document.getElementById('noBtn');
+            if (!noBtn) return;
+            const activeSceneId = document.querySelector('.scene.active')?.id;
+            if (activeSceneId !== 's5') return;
+            
+            const { x, y } = getSafeNoPosition();
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+            noBtn.style.transform = 'scale(0.97)';
+            setTimeout(() => { if(noBtn) noBtn.style.transform = ''; }, 100);
+        }
+
+        function attachMovingEvents() {
+            const noBtn = document.getElementById('noBtn');
+            if (!noBtn) return;
+            noBtn.addEventListener('mouseenter', moveNoButton);
+            noBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                moveNoButton();
+                return false;
+            });
+            noBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                moveNoButton();
+                return false;
+            });
+            window.addEventListener('resize', () => {
+                if (document.getElementById('s5')?.classList.contains('active')) {
+                    repositionNoButtonInitial();
+                }
+            });
+        }
+
+        // EXTENDED CELEBRATION WITH MORE CONFETTI
+        function celebrate() {
+            goToScene('sFinal');
+            // Multiple confetti bursts
+            canvasConfetti({ particleCount: 350, spread: 110, origin: { y: 0.5 }, colors: ['#d4af37', '#ff4d6d', '#ffccd5', '#ffffff'], startVelocity: 22 });
+            canvasConfetti({ particleCount: 200, spread: 85, origin: { y: 0.6, x: 0.2 }, colors: ['#ff4d6d', '#d4af37'] });
+            canvasConfetti({ particleCount: 200, spread: 85, origin: { y: 0.6, x: 0.8 }, colors: ['#ffb3c6', '#d4af37'] });
+            setTimeout(() => {
+                canvasConfetti({ particleCount: 500, spread: 70, origin: { y: 0.4 }, startVelocity: 28, colors: ['#ff4d6d', '#ffffff', '#d4af37'] });
+            }, 150);
+            setTimeout(() => {
+                canvasConfetti({ particleCount: 300, spread: 60, origin: { y: 0.7 }, startVelocity: 20 });
+            }, 400);
+        }
+
+        // HEART PARTICLE GENERATOR (MORE VARIETY)
+        function createHearts() {
+            const container = document.getElementById('particles');
+            if (!container) return;
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('heart-particle');
+                const emojis = ['❤️', '🌸', '💖', '✨', '🌹', '💕', '💗', '🌺', '💓', '💘'];
+                heart.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = Math.random() * 26 + 16 + 'px';
+                heart.style.animationDuration = Math.random() * 3.5 + 3 + 's';
+                heart.style.opacity = Math.random() * 0.7 + 0.3;
+                container.appendChild(heart);
+                setTimeout(() => {
+                    if (heart && heart.remove) heart.remove();
+                }, 4800);
+            }, 400);
+        }
+
+        // BIND ALL GLOBAL EVENTS
+        function bindGlobalEvents() {
+            const startBtn = document.getElementById('startMagicBtn');
+            if (startBtn) startBtn.addEventListener('click', startJourney);
+            
+            const next1Btn = document.getElementById('next1');
+            if (next1Btn) next1Btn.addEventListener('click', startChapter2);
+            
+            const next2Btn = document.getElementById('next2');
+            if (next2Btn) next2Btn.addEventListener('click', goToPhotoScene);
+            
+            const gotoPromises = document.getElementById('gotoPromisesBtn');
+            if (gotoPromises) gotoPromises.addEventListener('click', goToPromises);
+            
+            const lastQuestion = document.getElementById('lastQuestionBtn');
+            if (lastQuestion) lastQuestion.addEventListener('click', goToExtraRomantic);
+            
+            const gotoQuestion = document.getElementById('gotoQuestionBtn');
+            if (gotoQuestion) gotoQuestion.addEventListener('click', goToQuestion);
+            
+            const yesButton = document.getElementById('yesBtn');
+            if (yesButton) yesButton.addEventListener('click', celebrate);
+            
+            attachMovingEvents();
+        }
+
+        // OBSERVER FOR SCENE 5
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mut) => {
+                if (mut.type === 'attributes' && mut.attributeName === 'class') {
+                    const target = mut.target;
+                    if (target.id === 's5' && target.classList.contains('active')) {
+                        repositionNoButtonInitial();
+                    }
+                }
+            });
+        });
+        const scene5 = document.getElementById('s5');
+        if (scene5) observer.observe(scene5, { attributes: true });
+
+        window.addEventListener('resize', () => {
+            if (document.getElementById('s5')?.classList.contains('active')) {
+                repositionNoButtonInitial();
+            }
+        });
+        
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                if (document.getElementById('s5')?.classList.contains('active')) repositionNoButtonInitial();
+            }, 30);
+        });
+
+        window.onload = () => {
+            createHearts();
+            bindGlobalEvents();
+            const queenImg = document.getElementById('myQueenImg');
+            if (queenImg && queenImg.complete && queenImg.naturalWidth === 0) fixImage();
+            setTimeout(() => {
+                const imgCheck = document.getElementById('myQueenImg');
+                if (imgCheck && imgCheck.naturalWidth === 0) fixImage();
+            }, 600);
+        };
+
+        const imgElement = document.getElementById('myQueenImg');
+        if (imgElement) imgElement.onerror = fixImage;
+    </script>
+</body>
+</html>
